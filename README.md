@@ -1,7 +1,6 @@
 # 🚀 NexaTrip — Platform Pemesanan Tiket & Travel
 
-> **Proyek Akademik Mata Kuliah Struktur Data & Algoritma**  
-> _Universitas / Program Studi: Pendidikan Teknologi Informasi_
+> **Proyek Akademik Mata Kuliah Struktur Data & Algoritma**
 
 ---
 
