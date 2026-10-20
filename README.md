@@ -54,5 +54,3 @@ Menggunakan paradigma _Object-Oriented Programming_ melalui ES6 Class untuk mend
 ## 👤 Pengembang
 
 - **Nama**: Ardandi Ilham Aryatama
-- **NIM / ID**: _(Isi NIM Anda di sini)_
-- **Mata Kuliah**: Struktur Data dan Algoritma
