@@ -1,0 +1,2100 @@
+<!doctype html>
+<html lang="id" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NexaTrip — Next Amazing Trip</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Plus Jakarta Sans"', "sans-serif"],
+              mono: ['"Fira Code"', "monospace"],
+            },
+            colors: {
+              nexa: {
+                50: "#eef8ff",
+                100: "#d8eeff",
+                500: "#1ba3f7",
+                600: "#0194F3",
+                700: "#0a7ad0",
+                800: "#0f5fa3",
+              },
+              sun: { 100: "#ffede5", 500: "#FF5E1F", 600: "#e64a0c" },
+            },
+            boxShadow: { card: "0 4px 20px -6px rgba(1, 148, 243, 0.12)" },
+          },
+        },
+      };
+    </script>
+    <style>
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .content-transition {
+        transition: margin-right 0.3s ease-in-out;
+      }
+
+      .code-scroll::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      .code-scroll::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      .code-scroll::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 4px;
+      }
+      .code-scroll::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+      }
+
+      .cart-scroll::-webkit-scrollbar {
+        width: 5px;
+      }
+      .cart-scroll::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      .cart-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+      }
+
+      .sorting-active {
+        outline: 3px solid #ff5e1f !important;
+        transform: scale(1.03);
+        box-shadow: 0 20px 25px -5px rgba(255, 94, 31, 0.3) !important;
+        z-index: 30;
+      }
+
+      /* STYLES ANIMASI RESLETING KOPER (OPENING) */
+      #openingScreen {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+
+      .suitcase-half {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 50%;
+        background: linear-gradient(135deg, #0f5fa3 0%, #0194f3 100%);
+        transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.2);
+      }
+
+      .suitcase-left {
+        left: 0;
+        border-right: 4px dashed #f59e0b;
+      }
+
+      .suitcase-right {
+        right: 0;
+        border-left: 4px dashed #f59e0b;
+      }
+
+      /* Efek Resleting Terbuka */
+      .open-left {
+        transform: translateX(-100%);
+      }
+
+      .open-right {
+        transform: translateX(100%);
+      }
+
+      #zipperPuller {
+        position: absolute;
+        z-index: 10;
+        transition: all 0.8s ease-in-out;
+      }
+
+      .zipper-slide-down {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-slate-50 font-sans text-slate-800 antialiased overflow-x-hidden"
+  >
+    <!-- ANIMASI OPENING RESLETING KOPER -->
+    <div id="openingScreen">
+      <!-- Sisi Kiri Koper -->
+      <div id="suitcaseLeft" class="suitcase-half suitcase-left items-end pr-8">
+        <div class="text-right text-white space-y-1">
+          <span class="text-4xl">🧳</span>
+          <h2 class="text-2xl font-black tracking-tight">
+            Nexa<span class="text-amber-300">Trip</span>
+          </h2>
+          <p class="text-[11px] text-sky-100 font-medium">
+            Mempersiapkan Liburan Anda...
+          </p>
+        </div>
+      </div>
+
+      <!-- Kepala Resleting (Zipper Puller) -->
+      <div
+        id="zipperPuller"
+        class="flex flex-col items-center justify-center cursor-pointer"
+      >
+        <div
+          class="w-12 h-12 rounded-full bg-amber-400 border-4 border-white shadow-2xl grid place-items-center text-xl animate-bounce"
+        >
+          🤐
+        </div>
+        <span
+          class="text-[10px] font-extrabold text-white bg-slate-900/80 px-2.5 py-1 rounded-full mt-2 shadow"
+          >Membuka Koper...</span
+        >
+      </div>
+
+      <!-- Sisi Kanan Koper -->
+      <div
+        id="suitcaseRight"
+        class="suitcase-half suitcase-right items-start pl-8"
+      >
+        <div class="text-left text-white/80 space-y-2">
+          <div class="w-12 h-2 bg-white/30 rounded-full"></div>
+          <div class="w-20 h-2 bg-white/20 rounded-full"></div>
+          <div class="w-16 h-2 bg-white/20 rounded-full"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WRAPPER UTAMA KONTEN -->
+    <div id="mainContentWrapper" class="content-transition mr-0">
+      <!-- NAVBAR -->
+      <header
+        class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm"
+      >
+        <div
+          class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between"
+        >
+          <a href="#beranda" class="flex items-center gap-2.5">
+            <span
+              class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-nexa-600 to-sky-400 grid place-items-center shadow-md shadow-nexa-600/30"
+            >
+              <svg viewBox="0 0 24 24" class="w-5 h-5" fill="white">
+                <path d="M2.5 11.2 21 3l-8.2 18.5-2.3-7.9-8-2.4z" />
+              </svg>
+            </span>
+            <span class="text-2xl font-extrabold tracking-tight text-nexa-700"
+              >Nexa<span class="text-sun-500">Trip</span></span
+            >
+          </a>
+
+          <nav
+            class="hidden md:flex items-center gap-1 text-sm font-semibold text-slate-600"
+          >
+            <a
+              href="#beranda"
+              class="px-4 py-2 rounded-xl hover:bg-nexa-50 hover:text-nexa-700 transition"
+              >Home</a
+            >
+            <a
+              href="#layanan"
+              class="px-4 py-2 rounded-xl hover:bg-nexa-50 hover:text-nexa-700 transition"
+              >Destinasi & Layanan</a
+            >
+            <a
+              href="#tentang"
+              class="px-4 py-2 rounded-xl hover:bg-nexa-50 hover:text-nexa-700 transition"
+              >Tentang Kami</a
+            >
+            <a
+              href="#testimoni"
+              class="px-4 py-2 rounded-xl hover:bg-nexa-50 hover:text-nexa-700 transition"
+              >Ulasan Pengguna</a
+            >
+            <a
+              href="#materi-sda"
+              class="px-4 py-2 rounded-xl hover:bg-nexa-50 hover:text-nexa-700 transition"
+              >Lab Materi</a
+            >
+          </nav>
+
+          <div class="flex items-center gap-2">
+            <!-- MENU TIKET BELUM DIBAYAR -->
+            <button
+              onclick="bukaDrawerBelumDibayar()"
+              class="relative flex items-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs sm:text-sm rounded-2xl px-3.5 py-2.5 transition border border-amber-200/80"
+            >
+              ⏳ <span class="hidden sm:inline">Belum Dibayar</span>
+              <span
+                id="badgeBelumDibayar"
+                class="min-w-[20px] h-5 px-1.5 rounded-full bg-amber-500 text-white text-[11px] font-extrabold grid place-items-center shadow"
+                >0</span
+              >
+            </button>
+
+            <!-- MENU KERANJANG -->
+            <button
+              onclick="bukaKeranjang()"
+              class="relative flex items-center gap-2 bg-nexa-50 hover:bg-nexa-100 text-nexa-700 font-bold text-xs sm:text-sm rounded-2xl px-3.5 py-2.5 transition"
+            >
+              🛒 <span class="hidden sm:inline">Pesanan</span>
+              <span
+                id="badgeKeranjang"
+                class="min-w-[20px] h-5 px-1.5 rounded-full bg-sun-500 text-white text-[11px] font-extrabold grid place-items-center shadow"
+                >0</span
+              >
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- HERO SECTION -->
+      <section
+        id="beranda"
+        class="relative text-white pt-16 pb-36 px-4 overflow-hidden bg-cover bg-center"
+        style="
+          background-image: url(&quot;https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1920&q=80&quot;);
+        "
+      >
+        <div class="absolute inset-0 bg-slate-900/65 backdrop-blur-[2px]"></div>
+
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+          <span
+            class="inline-block bg-white/20 backdrop-blur text-xs font-bold rounded-full px-4 py-1.5 mb-4 shadow-sm border border-white/20"
+          >
+            ✨ Nikmati Kemudahan Perjalanan Tanpa Batas
+          </span>
+          <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">
+            Mau pergi ke mana hari ini?
+          </h1>
+          <p class="mt-3 text-white/90 text-sm md:text-base max-w-2xl mx-auto">
+            Temukan tiket pesawat, hotel berbintang, kereta, hingga tiket
+            atraksi wisata terbaik dengan harga transparan.
+          </p>
+
+          <!-- SEARCH BAR -->
+          <div
+            class="mt-8 bg-white rounded-3xl p-3 shadow-2xl flex flex-col md:flex-row gap-2"
+          >
+            <div
+              class="flex-1 flex items-center gap-3 px-4 py-3 bg-slate-50 rounded-2xl border border-slate-100"
+            >
+              <span class="text-xl">🔍</span>
+              <input
+                id="inputCari"
+                type="text"
+                placeholder="Cari maskapai, hotel, kota tujuan, atau atraksi..."
+                class="w-full bg-transparent text-slate-800 placeholder-slate-400 font-semibold text-sm outline-none"
+                autocomplete="off"
+              />
+            </div>
+            <button
+              onclick="jalankanPencarian()"
+              class="bg-sun-500 hover:bg-sun-600 text-white font-extrabold px-8 py-3.5 rounded-2xl transition shadow-lg shadow-sun-500/30 text-sm"
+            >
+              Cari Sekarang
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION KATALOG (LAYANAN) -->
+      <main
+        id="layanan"
+        class="max-w-7xl mx-auto px-4 -mt-16 relative z-20 pb-12"
+      >
+        <div
+          class="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 md:p-8"
+        >
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-100"
+          >
+            <div
+              id="filterKategoriContainer"
+              class="flex gap-2 overflow-x-auto no-scrollbar w-full md:w-auto pb-2 md:pb-0"
+            >
+              <button
+                onclick="filterKategori('all')"
+                class="cat-pill active-pill shrink-0 px-4 py-2 rounded-2xl text-xs font-bold transition bg-nexa-600 text-white shadow-md shadow-nexa-600/20"
+              >
+                Semua Layanan
+              </button>
+              <button
+                onclick="filterKategori('pesawat')"
+                class="cat-pill shrink-0 px-4 py-2 rounded-2xl text-xs font-bold transition bg-slate-100 text-slate-600 hover:bg-slate-200"
+              >
+                ✈️ Tiket Pesawat
+              </button>
+              <button
+                onclick="filterKategori('hotel')"
+                class="cat-pill shrink-0 px-4 py-2 rounded-2xl text-xs font-bold transition bg-slate-100 text-slate-600 hover:bg-slate-200"
+              >
+                🏨 Hotel
+              </button>
+              <button
+                onclick="filterKategori('kereta')"
+                class="cat-pill shrink-0 px-4 py-2 rounded-2xl text-xs font-bold transition bg-slate-100 text-slate-600 hover:bg-slate-200"
+              >
+                🚆 Kereta Api
+              </button>
+              <button
+                onclick="filterKategori('atraksi')"
+                class="cat-pill shrink-0 px-4 py-2 rounded-2xl text-xs font-bold transition bg-slate-100 text-slate-600 hover:bg-slate-200"
+              >
+                🎡 Atraksi & Aktivitas
+              </button>
+            </div>
+
+            <!-- Dropdown Sorting -->
+            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+              <span class="text-xs font-bold text-slate-400">Urutkan:</span>
+              <select
+                id="selectSorting"
+                onchange="jalankanSortingDropdown(this.value)"
+                class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 px-4 py-2.5 rounded-2xl text-xs font-extrabold transition outline-none cursor-pointer"
+              >
+                <option value="default">Pilih Urutan Harga</option>
+                <option value="asc">🏷️ Harga Termurah ke Termahal</option>
+                <option value="desc">🏷️ Harga Termahal ke Termurah</option>
+              </select>
+            </div>
+          </div>
+
+          <div
+            id="infoPencarian"
+            class="hidden mt-4 bg-sky-50 border border-sky-100 text-nexa-800 px-4 py-3 rounded-2xl text-sm flex justify-between items-center"
+          >
+            <span id="teksInfoPencarian"></span>
+            <button
+              onclick="resetPencarian()"
+              class="text-xs font-extrabold text-nexa-600 hover:underline"
+            >
+              Hapus Pencarian
+            </button>
+          </div>
+
+          <div
+            id="gridProduk"
+            class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          ></div>
+        </div>
+      </main>
+
+      <!-- SECTION TENTANG KAMI -->
+      <section id="tentang" class="max-w-7xl mx-auto px-4 py-12">
+        <div
+          class="bg-gradient-to-r from-nexa-700 to-nexa-500 rounded-3xl p-8 md:p-12 text-white shadow-xl flex flex-col md:flex-row items-center gap-8"
+        >
+          <div class="flex-1 space-y-4">
+            <span class="bg-white/20 text-xs font-bold px-3 py-1.5 rounded-full"
+              >Tentang NexaTrip</span
+            >
+            <h2 class="text-2xl md:text-3xl font-extrabold">
+              Platform Perjalanan Terpercaya untuk Semua Kebutuhan Anda
+            </h2>
+            <p class="text-white/90 text-sm md:text-base leading-relaxed">
+              NexaTrip adalah platform super-app pemesanan tiket perjalanan dan
+              akomodasi modern. Kami hadir untuk memudahkan Anda merencanakan
+              liburan maupun perjalanan bisnis dengan cepat, aman, dan harga
+              terbaik di kelasnya.
+            </p>
+            <div class="grid grid-cols-2 gap-4 pt-2">
+              <div class="bg-white/10 p-4 rounded-2xl backdrop-blur">
+                <p class="text-2xl font-extrabold">100%</p>
+                <p class="text-xs text-white/80">Aman & Terverifikasi</p>
+              </div>
+              <div class="bg-white/10 p-4 rounded-2xl backdrop-blur">
+                <p class="text-2xl font-extrabold">24/7</p>
+                <p class="text-xs text-white/80">Dukungan Pelanggan</p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="w-full md:w-1/3 bg-white/10 p-6 rounded-3xl backdrop-blur border border-white/20"
+          >
+            <h3 class="font-bold text-lg mb-2">💡 Teknologi Dibalik Layar</h3>
+            <p class="text-xs text-white/80 leading-relaxed">
+              Website ini menerapkan konsep dasar Algoritma & Struktur Data
+              seperti <b>Struct (ES6 Class)</b>, <b>Array</b>,
+              <b>Pointer/Reference Memory</b>, <b>Bubble Sort</b>, dan
+              <b>Linear Search</b> secara optimal.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION ULASAN PENGGUNA -->
+      <section id="testimoni" class="max-w-7xl mx-auto px-4 py-12 mb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-4 space-y-4">
+            <span
+              class="bg-nexa-100 text-nexa-700 text-xs font-bold px-3 py-1 rounded-full"
+              >Ulasan Pengguna</span
+            >
+            <h2
+              class="text-2xl md:text-3xl font-extrabold text-slate-800 leading-snug"
+            >
+              Apa Kata Mereka Tentang NexaTrip?
+            </h2>
+            <p class="text-sm text-slate-500 leading-relaxed">
+              Pengalaman nyata dari para traveler yang telah mempercayakan
+              perjalanan liburan dan bisnis mereka bersama kami.
+            </p>
+            <div
+              class="flex items-center gap-2 pt-2 text-amber-500 font-bold text-sm"
+            >
+              <span>⭐⭐⭐⭐⭐</span>
+              <span class="text-slate-700">4.9 / 5.0 (Rata-rata Kepuasan)</span>
+            </div>
+          </div>
+
+          <div
+            class="lg:col-span-8 overflow-x-auto no-scrollbar flex gap-6 pb-4 pt-2"
+          >
+            <div
+              class="w-[320px] sm:w-[360px] shrink-0 bg-white p-6 rounded-3xl border border-slate-100 shadow-card flex flex-col justify-between"
+            >
+              <div>
+                <div class="text-amber-400 text-sm mb-3">★★★★★</div>
+                <p class="text-sm text-slate-600 italic leading-relaxed">
+                  "Pesan tiket pesawat lewat NexaTrip gampang banget! Harganya
+                  juga beneran transparan tanpa biaya tersembunyi. Mantap!"
+                </p>
+              </div>
+              <div
+                class="mt-6 flex items-center gap-3 pt-4 border-t border-slate-100"
+              >
+                <div
+                  class="w-10 h-10 rounded-full bg-nexa-100 text-nexa-700 font-extrabold grid place-items-center"
+                >
+                  RD
+                </div>
+                <div>
+                  <p class="font-bold text-sm text-slate-800">Rizky Darmawan</p>
+                  <p class="text-xs text-slate-400">Traveler Asal Surabaya</p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="w-[320px] sm:w-[360px] shrink-0 bg-white p-6 rounded-3xl border border-slate-100 shadow-card flex flex-col justify-between"
+            >
+              <div>
+                <div class="text-amber-400 text-sm mb-3">★★★★★</div>
+                <p class="text-sm text-slate-600 italic leading-relaxed">
+                  "Fitur urutkan harga termurahnya ngebantu banget pas cari
+                  hotel di Bali. Interface-nya bersih dan modern banget!"
+                </p>
+              </div>
+              <div
+                class="mt-6 flex items-center gap-3 pt-4 border-t border-slate-100"
+              >
+                <div
+                  class="w-10 h-10 rounded-full bg-sun-100 text-sun-600 font-extrabold grid place-items-center"
+                >
+                  AN
+                </div>
+                <div>
+                  <p class="font-bold text-sm text-slate-800">
+                    Anisa Novitasari
+                  </p>
+                  <p class="text-xs text-slate-400">Mahasiswa & Backpacker</p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="w-[320px] sm:w-[360px] shrink-0 bg-white p-6 rounded-3xl border border-slate-100 shadow-card flex flex-col justify-between"
+            >
+              <div>
+                <div class="text-amber-400 text-sm mb-3">★★★★★</div>
+                <p class="text-sm text-slate-600 italic leading-relaxed">
+                  "Proses pemesanan cepat dan e-voucher langsung masuk ke
+                  sistem. Sangat recommended buat yang suka jalan-jalan."
+                </p>
+              </div>
+              <div
+                class="mt-6 flex items-center gap-3 pt-4 border-t border-slate-100"
+              >
+                <div
+                  class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 font-extrabold grid place-items-center"
+                >
+                  AS
+                </div>
+                <div>
+                  <p class="font-bold text-sm text-slate-800">Ahmad Setiawan</p>
+                  <p class="text-xs text-slate-400">Pekerja Kantoran</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION MATERI STRUKTUR DATA & ALGORITMA -->
+      <section id="materi-sda" class="max-w-7xl mx-auto px-4 py-12 mb-12">
+        <div
+          class="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 md:p-10"
+        >
+          <div class="max-w-3xl mx-auto text-center mb-10">
+            <span
+              class="bg-nexa-100 text-nexa-700 text-xs font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider"
+              >Dokumentasi Laboratorium</span
+            >
+            <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800 mt-3">
+              Materi Struktur Data & Algoritma
+            </h2>
+            <p class="text-xs md:text-sm text-slate-500 mt-2">
+              Penerapan konsep dasar ilmu komputer pada arsitektur sistem
+              platform NexaTrip.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+            <div
+              class="bg-slate-50/80 rounded-2xl p-5 md:p-6 border border-slate-200/70 flex flex-col justify-between h-full shadow-sm"
+            >
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-nexa-600"></span>
+                  <h3
+                    class="text-xs font-extrabold text-nexa-700 uppercase tracking-wider"
+                  >
+                    1. STRUCT (ES6 CLASS)
+                  </h3>
+                </div>
+                <p class="text-xs text-slate-600 mb-4 h-10 leading-relaxed">
+                  Mendefinisikan cetak biru objek
+                  <code
+                    class="text-nexa-700 font-mono font-bold bg-nexa-50 px-1 py-0.5 rounded"
+                    >LayananTravel</code
+                  >
+                  untuk menampung data atribut produk secara terstruktur.
+                </p>
+              </div>
+              <div
+                class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 shadow-inner"
+              >
+                <div
+                  class="bg-slate-800/80 px-3 py-2 flex items-center justify-between border-b border-slate-700/50 text-[10px] font-mono text-slate-400"
+                >
+                  <div class="flex gap-1.5">
+                    <span
+                      class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"
+                    ></span
+                    ><span
+                      class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"
+                    ></span
+                    ><span
+                      class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"
+                    ></span>
+                  </div>
+                  <span>LayananTravel.js</span>
+                </div>
+                <pre
+                  class="p-4 text-slate-200 text-[11px] font-mono leading-relaxed overflow-x-auto code-scroll h-48"
+                >
+class LayananTravel {
+  constructor(id, kategori, nama, lokasi, harga, rincian, gambar) {
+    this.id = id;
+    this.kategori = kategori;
+    this.nama = nama;
+    this.lokasi = lokasi;
+    this.harga = harga;
+    this.rincian = rincian;
+    this.gambar = gambar;
+  }
+}</pre
+                >
+              </div>
+            </div>
+
+            <div
+              class="bg-slate-50/80 rounded-2xl p-5 md:p-6 border border-slate-200/70 flex flex-col justify-between h-full shadow-sm"
+            >
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-nexa-600"></span>
+                  <h3
+                    class="text-xs font-extrabold text-nexa-700 uppercase tracking-wider"
+                  >
+                    2. ARRAY MASTER & DINAMIS
+                  </h3>
+                </div>
+                <p class="text-xs text-slate-600 mb-4 h-10 leading-relaxed">
+                  Menyimpan kumpulan instansiasi objek dalam array statis master
+                  <code
+                    class="text-nexa-700 font-mono font-bold bg-nexa-50 px-1 py-0.5 rounded"
+                    >dataLayanan[]</code
+                  >
+                  serta array keranjang dinamis.
+                </p>
+              </div>
+              <div
+                class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 shadow-inner"
+              >
+                <div
+                  class="bg-slate-800/80 px-3 py-2 flex items-center justify-between border-b border-slate-700/50 text-[10px] font-mono text-slate-400"
+                >
+                  <div class="flex gap-1.5">
+                    <span
+                      class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"
+                    ></span
+                    ><span
+                      class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"
+                    ></span
+                    ><span
+                      class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"
+                    ></span>
+                  </div>
+                  <span>dataMaster.js</span>
+                </div>
+                <pre
+                  class="p-4 text-slate-200 text-[11px] font-mono leading-relaxed overflow-x-auto code-scroll h-48"
+                >
+const dataLayanan = [
+  new LayananTravel(1, "pesawat", "Garuda Indonesia", ...),
+  new LayananTravel(2, "pesawat", "Citilink Indonesia", ...),
+  new LayananTravel(3, "hotel", "The Mulia Resort", ...)
+];
+
+const keranjang = [];</pre
+                >
+              </div>
+            </div>
+
+            <div
+              class="bg-slate-50/80 rounded-2xl p-5 md:p-6 border border-slate-200/70 flex flex-col justify-between h-full shadow-sm"
+            >
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-nexa-600"></span>
+                  <h3
+                    class="text-xs font-extrabold text-nexa-700 uppercase tracking-wider"
+                  >
+                    3. POINTER & MEMORY REFERENCE
+                  </h3>
+                </div>
+                <p class="text-xs text-slate-600 mb-4 h-10 leading-relaxed">
+                  Manipulasi posisi elemen array dilakukan melalui pertukaran
+                  alamat memori tanpa duplikasi memori objek.
+                </p>
+              </div>
+              <div
+                class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 shadow-inner"
+              >
+                <div
+                  class="bg-slate-800/80 px-3 py-2 flex items-center justify-between border-b border-slate-700/50 text-[10px] font-mono text-slate-400"
+                >
+                  <div class="flex gap-1.5">
+                    <span
+                      class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"
+                    ></span
+                    ><span
+                      class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"
+                    ></span
+                    ><span
+                      class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"
+                    ></span>
+                  </div>
+                  <span>pointerSwap.js</span>
+                </div>
+                <pre
+                  class="p-4 text-slate-200 text-[11px] font-mono leading-relaxed overflow-x-auto code-scroll h-48"
+                >
+let temp = daftarAktif[j];
+daftarAktif[j] = daftarAktif[j + 1];
+daftarAktif[j + 1] = temp;
+
+keranjang.push(dataLayanan[id]);</pre
+                >
+              </div>
+            </div>
+
+            <div
+              class="bg-slate-50/80 rounded-2xl p-5 md:p-6 border border-slate-200/70 flex flex-col justify-between h-full shadow-sm"
+            >
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-nexa-600"></span>
+                  <h3
+                    class="text-xs font-extrabold text-nexa-700 uppercase tracking-wider"
+                  >
+                    4. BUBBLE SORT O(N²)
+                  </h3>
+                </div>
+                <p class="text-xs text-slate-600 mb-4 h-10 leading-relaxed">
+                  Algoritma pengurutan harga tiket/hotel dengan perbandingan
+                  elemen bersebelahan dan optimasi flag
+                  <code
+                    class="text-nexa-700 font-mono font-bold bg-nexa-50 px-1 py-0.5 rounded"
+                    >swapped</code
+                  >.
+                </p>
+              </div>
+              <div
+                class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 shadow-inner"
+              >
+                <div
+                  class="bg-slate-800/80 px-3 py-2 flex items-center justify-between border-b border-slate-700/50 text-[10px] font-mono text-slate-400"
+                >
+                  <div class="flex gap-1.5">
+                    <span
+                      class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"
+                    ></span
+                    ><span
+                      class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"
+                    ></span
+                    ><span
+                      class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"
+                    ></span>
+                  </div>
+                  <span>bubbleSort.js</span>
+                </div>
+                <pre
+                  class="p-4 text-slate-200 text-[11px] font-mono leading-relaxed overflow-x-auto code-scroll h-48"
+                >
+for (let i = 0; i &lt; n - 1; i++) {
+  let swapped = false;
+  for (let j = 0; j &lt; n - i - 1; j++) {
+    if (daftarAktif[j].harga &gt; daftarAktif[j + 1].harga) {
+      let temp = daftarAktif[j];
+      daftarAktif[j] = daftarAktif[j + 1];
+      daftarAktif[j + 1] = temp;
+      swapped = true;
+    }
+  }
+  if (!swapped) break;
+}</pre
+                >
+              </div>
+            </div>
+
+            <div
+              class="bg-slate-50/80 rounded-2xl p-5 md:p-6 border border-slate-200/70 flex flex-col justify-between h-full shadow-sm md:col-span-2"
+            >
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-nexa-600"></span>
+                  <h3
+                    class="text-xs font-extrabold text-nexa-700 uppercase tracking-wider"
+                  >
+                    5. LINEAR SEARCH O(N)
+                  </h3>
+                </div>
+                <p class="text-xs text-slate-600 mb-3 leading-relaxed">
+                  Pencarian sekunsial yang menelusuri setiap elemen dari indeks
+                  awal sampai akhir untuk mencocokkan kata kunci pada properti
+                  <code
+                    class="text-nexa-700 font-mono font-bold bg-nexa-50 px-1 py-0.5 rounded"
+                    >nama</code
+                  >
+                  atau
+                  <code
+                    class="text-nexa-700 font-mono font-bold bg-nexa-50 px-1 py-0.5 rounded"
+                    >lokasi</code
+                  >.
+                </p>
+              </div>
+              <div
+                class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 shadow-inner mt-2"
+              >
+                <div
+                  class="bg-slate-800/80 px-3 py-2 flex items-center justify-between border-b border-slate-700/50 text-[10px] font-mono text-slate-400"
+                >
+                  <div class="flex gap-1.5">
+                    <span
+                      class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"
+                    ></span
+                    ><span
+                      class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"
+                    ></span
+                    ><span
+                      class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"
+                    ></span>
+                  </div>
+                  <span>linearSearch.js</span>
+                </div>
+                <pre
+                  class="p-4 text-slate-200 text-[11px] font-mono leading-relaxed overflow-x-auto code-scroll h-36"
+                >
+for (let i = 0; i &lt; dataLayanan.length; i++) {
+  let item = dataLayanan[i];
+  if (item.nama.toLowerCase().includes(keyword) || item.lokasi.toLowerCase().includes(keyword)) {
+    hasilPencarian.push(item);
+  }
+}</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer
+        class="bg-gradient-to-r from-nexa-700 via-nexa-600 to-sky-500 py-8 text-center text-xs text-white/90 font-medium shadow-inner"
+      >
+        <p>
+          NexaTrip &copy; 2026 • Platform Layanan Perjalanan &amp; Pemesanan
+          Terintegrasi
+        </p>
+      </footer>
+    </div>
+
+    <!-- TOMBOL FLOATING LOG TERMINAL -->
+    <button
+      id="btnFloatingLog"
+      onclick="toggleTerminalLog()"
+      class="fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-slate-900 hover:bg-slate-800 text-white p-3 rounded-l-2xl shadow-2xl flex items-center gap-2 border-l border-t border-b border-slate-700 transition-all duration-300 group cursor-pointer"
+    >
+      <span class="font-mono font-bold text-sky-400 text-base">&gt;_</span>
+      <span
+        class="text-xs font-bold font-mono hidden group-hover:inline-block pr-1"
+        >Live Log</span
+      >
+    </button>
+
+    <!-- PANEL SAMPING TERMINAL -->
+    <aside
+      id="sideLogPanel"
+      class="fixed top-0 right-0 z-50 h-full w-80 md:w-96 bg-slate-900 border-l border-slate-800 shadow-2xl translate-x-full transition-transform duration-300 flex flex-col"
+    >
+      <div
+        class="bg-slate-800/90 px-4 py-4 flex items-center justify-between border-b border-slate-700/50"
+      >
+        <div class="flex items-center gap-2">
+          <div class="flex gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span
+            ><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span
+            ><span
+              class="w-3 h-3 rounded-full bg-emerald-500 inline-block"
+            ></span>
+          </div>
+          <span class="text-xs font-mono font-bold text-slate-300 ml-1"
+            >live-log@nexatrip</span
+          >
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            onclick="bersihkanLog(event)"
+            class="text-[10px] font-mono text-slate-300 hover:text-white bg-slate-700/70 px-2 py-1 rounded transition"
+          >
+            Clear
+          </button>
+          <button
+            onclick="toggleTerminalLog()"
+            class="w-7 h-7 rounded-lg bg-slate-700/70 text-slate-300 hover:text-white grid place-items-center text-xs font-bold transition"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+      <div
+        id="terminalBody"
+        class="p-4 flex-1 overflow-y-auto font-mono text-[11px] leading-relaxed text-slate-200 space-y-1.5"
+      ></div>
+      <div
+        class="p-3 bg-slate-950 border-t border-slate-800 text-[10px] font-mono text-slate-500 text-center"
+      >
+        SDA Real-time Live Log Terminal
+      </div>
+    </aside>
+
+    <!-- MODAL DETAIL LAYANAN -->
+    <div
+      id="modalDetail"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden grid place-items-center p-4"
+    >
+      <div
+        id="kontenModal"
+        class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden"
+      ></div>
+    </div>
+
+    <!-- MODAL PEMBAYARAN & PEMESANAN -->
+    <div
+      id="modalVerifikasi"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden grid place-items-center p-4 overflow-y-auto"
+    >
+      <div
+        id="kontenVerifikasi"
+        class="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden p-6 md:p-8 my-8 max-h-[90vh] overflow-y-auto cart-scroll"
+      ></div>
+    </div>
+
+    <!-- DRAWER KERANJANG PESANAN -->
+    <div
+      id="overlayKeranjang"
+      onclick="tutupKeranjang()"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity"
+    ></div>
+    <aside
+      id="drawerKeranjang"
+      class="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-slate-100/90 border-l border-slate-200 shadow-2xl translate-x-full transition-transform duration-300 flex flex-col"
+    >
+      <div
+        class="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-nexa-700 to-nexa-600 text-white shadow-md"
+      >
+        <div class="flex items-center gap-3">
+          <span
+            class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur grid place-items-center text-lg"
+            >🛒</span
+          >
+          <div>
+            <h3 class="font-extrabold text-base tracking-tight">
+              Keranjang Pesanan
+            </h3>
+            <p class="text-[11px] text-white/80">
+              Pilih item yang ingin Anda bayar sekarang
+            </p>
+          </div>
+        </div>
+        <button
+          onclick="tutupKeranjang()"
+          class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white grid place-items-center font-bold text-sm transition"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div
+        id="listKeranjang"
+        class="flex-1 overflow-y-auto p-5 space-y-4 cart-scroll"
+      ></div>
+
+      <div class="p-6 border-t border-slate-200/80 bg-white shadow-lg">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <span
+              class="text-xs font-bold text-slate-400 block uppercase tracking-wider"
+              >Total Pembayaran</span
+            >
+            <span
+              id="totalHargaKeranjang"
+              class="text-2xl font-black text-sun-500"
+              >Rp 0</span
+            >
+          </div>
+          <span
+            id="badgeItemTerpilih"
+            class="text-[11px] font-bold text-nexa-700 bg-nexa-50 border border-nexa-100 px-3 py-1 rounded-full"
+          >
+            0 item dipilih
+          </span>
+        </div>
+        <button
+          onclick="mulaiVerifikasi2Langkah()"
+          class="w-full bg-sun-500 hover:bg-sun-600 active:scale-[0.99] text-white font-extrabold py-3.5 rounded-2xl shadow-lg shadow-sun-500/30 transition-all text-sm flex items-center justify-center gap-2"
+        >
+          <span>Lanjut ke Pembayaran</span>
+          <span>➔</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- DRAWER TIKET BELUM DIBAYAR -->
+    <div
+      id="overlayBelumDibayar"
+      onclick="tutupDrawerBelumDibayar()"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity"
+    ></div>
+    <aside
+      id="drawerBelumDibayar"
+      class="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-slate-100/90 border-l border-slate-200 shadow-2xl translate-x-full transition-transform duration-300 flex flex-col"
+    >
+      <div
+        class="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-md"
+      >
+        <div class="flex items-center gap-3">
+          <span
+            class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur grid place-items-center text-lg"
+            >⏳</span
+          >
+          <div>
+            <h3 class="font-extrabold text-base tracking-tight">
+              Tiket Menunggu Pembayaran
+            </h3>
+            <p class="text-[11px] text-white/80">
+              Selesaikan transaksi tiket yang ditunda
+            </p>
+          </div>
+        </div>
+        <button
+          onclick="tutupDrawerBelumDibayar()"
+          class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white grid place-items-center font-bold text-sm transition"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div
+        id="listBelumDibayar"
+        class="flex-1 overflow-y-auto p-5 space-y-4 cart-scroll"
+      ></div>
+    </aside>
+
+    <!-- TOAST NOTIFIKASI -->
+    <div
+      id="toast"
+      class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] hidden bg-slate-900 text-white text-xs font-bold rounded-2xl px-5 py-3 shadow-2xl transition-all"
+    ></div>
+
+    <!-- SCRIPT LOGIKA PEMROGRAMAN DENGAN LIVE LOG AKTIF -->
+    <script>
+      class LayananTravel {
+        constructor(id, kategori, nama, lokasi, harga, rincian, gambar) {
+          this.id = id;
+          this.kategori = kategori;
+          this.nama = nama;
+          this.lokasi = lokasi;
+          this.harga = harga;
+          this.rincian = rincian;
+          this.gambar = gambar;
+        }
+      }
+
+      const dataLayanan = [
+        new LayananTravel(
+          1,
+          "pesawat",
+          "Garuda Indonesia",
+          "Jakarta (CGK) ➔ Bali (DPS)",
+          1350000,
+          ["Bagasi 20kg", "Makanan Gratis", "Kelas Eksekutif"],
+          "https://i.pinimg.com/736x/94/06/3c/94063cfdadba53d292bfdb9b75e9f126.jpg",
+        ),
+        new LayananTravel(
+          2,
+          "pesawat",
+          "Citilink Indonesia",
+          "Surabaya (SUB) ➔ Jakarta (CGK)",
+          850000,
+          ["Bagasi kabin 7kg", "Tepercaya & Tepat Waktu", "Kelas Ekonomi"],
+          "https://i.pinimg.com/1200x/ba/fb/a0/bafba0007c5093c32300e9d577fd254d.jpg",
+        ),
+        new LayananTravel(
+          3,
+          "hotel",
+          "The Mulia Resort & Villas",
+          "Nusa Dua, Bali",
+          2850000,
+          ["⭐️⭐️⭐️⭐️⭐️", "Sarapan untuk 2 orang", "Infinity Pool Tepi Pantai"],
+          "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80",
+        ),
+        new LayananTravel(
+          4,
+          "hotel",
+          "Hotel Indonesia Kempinski",
+          "Jakarta Pusat",
+          1950000,
+          ["⭐️⭐️⭐️⭐️⭐️", "Pusat Kota Jakarta", "Akses Spa & Gym Gratis"],
+          "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=600&q=80",
+        ),
+        new LayananTravel(
+          5,
+          "kereta",
+          "KA Argo Bromo Anggrek",
+          "Gambir (GMR) ➔ Pasar Turi (SBI)",
+          650000,
+          [
+            "Kelas Eksekutif Mewah",
+            "Waktu Tempuh Cepat",
+            "Stop Kontak & Wi-Fi",
+          ],
+          "https://i.pinimg.com/736x/60/3b/ca/603bca22be54f8c6a0af319b0766ea14.jpg",
+        ),
+        new LayananTravel(
+          6,
+          "atraksi",
+          "Tiket Masuk Dufan Ancol",
+          "Jakarta Utara",
+          270000,
+          [
+            "Akses Semua Wahana Reguler",
+            "E-Voucher Langsung Aktif",
+            "Berlaku 1 Hari",
+          ],
+          "https://i.pinimg.com/736x/31/a5/61/31a5613aa1e2d8705a503b06aaab15a8.jpg",
+        ),
+        new LayananTravel(
+          7,
+          "hotel",
+          "Grand Mercure",
+          "Malioboro, Yogyakarta",
+          750000,
+          ["⭐️⭐️⭐️⭐️", "Lokasi Strategis di Malioboro", "Sarapan Tradisional"],
+          "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=600&q=80",
+        ),
+        new LayananTravel(
+          8,
+          "pesawat",
+          "AirAsia Berhad",
+          "Surabaya (SUB) ➔ Kuala Lumpur (KUL)",
+          920000,
+          ["Penerbangan Internasional", "Bagasi kabin 7kg", "Harga Hemat"],
+          "https://i.pinimg.com/1200x/98/7f/04/987f04f738a8831e8c055db6f6e72cdc.jpg",
+        ),
+        new LayananTravel(
+          9,
+          "atraksi",
+          "Bromo Sunrise Jeep Tour",
+          "Malang, Jawa Timur",
+          650000,
+          [
+            "Termasuk Sewa Jeep 4x4",
+            "Pemandu Lokal Berpengalaman",
+            "Spot Sunrise Terbaik Pananjakan",
+          ],
+          "https://i.pinimg.com/736x/a6/5c/2d/a65c2d72076c0334d8986e9853521ee1.jpg",
+        ),
+      ];
+
+      let daftarAktif = [...dataLayanan];
+      const keranjang = [];
+      const tiketBelumDibayar = [];
+      const jumlahPesanan = new Map();
+      const tanggalPesanan = new Map();
+      const statusChecklist = new Map();
+      let kategoriTerpilih = "all";
+      let kodeOtpSimulasi = "";
+      let metodePembayaranTerpilih = "otp";
+      let dataPemesan = { nama: "", email: "", hp: "" };
+      let terminalTerbuka = false;
+
+      function getTanggalDefault() {
+        const besok = new Date();
+        besok.setDate(besok.getDate() + 1);
+        return besok.toISOString().split("T")[0];
+      }
+
+      const formatRupiah = (angka) => "Rp " + angka.toLocaleString("id-ID");
+
+      // LOGIKA ANIMASI OPENING RESLETING KOPER
+      function jalankanAnimasiOpening() {
+        catatLog("SYS", "Menjalankan animasi opening resleting koper...");
+        setTimeout(() => {
+          const puller = document.getElementById("zipperPuller");
+          const leftHalf = document.getElementById("suitcaseLeft");
+          const rightHalf = document.getElementById("suitcaseRight");
+
+          if (puller && leftHalf && rightHalf) {
+            puller.classList.add("zipper-slide-down");
+            leftHalf.classList.add("open-left");
+            rightHalf.classList.add("open-right");
+
+            setTimeout(() => {
+              const opening = document.getElementById("openingScreen");
+              if (opening) opening.style.display = "none";
+              catatLog("SYS", "Animasi opening selesai, halaman utama aktif.");
+            }, 1200);
+          }
+        }, 800);
+      }
+
+      // FUNGSI PENCATAT LIVE LOG
+      function catatLog(tipe, pesan) {
+        const body = document.getElementById("terminalBody");
+        if (!body) return;
+        const sekarang = new Date();
+        const jam = String(sekarang.getHours()).padStart(2, "0");
+        const menit = String(sekarang.getMinutes()).padStart(2, "0");
+        const detik = String(sekarang.getSeconds()).padStart(2, "0");
+        const milidetik = String(sekarang.getMilliseconds()).padStart(3, "0");
+        const formatJam = `${jam}:${menit}:${detik}.${milidetik}`;
+
+        let warna = "text-sky-400";
+        if (tipe === "SORT") warna = "text-amber-400";
+        if (tipe === "SEARCH") warna = "text-emerald-400";
+        if (tipe === "CART") warna = "text-purple-400";
+        if (tipe === "AUTH") warna = "text-rose-400";
+        if (tipe === "FILTER") warna = "text-indigo-400";
+
+        const row = document.createElement("div");
+        row.innerHTML = `<span class="text-slate-500">[${formatJam}]</span> <span class="${warna} font-bold">[${tipe}]</span> ${pesan}`;
+        body.appendChild(row);
+        body.scrollTop = body.scrollHeight;
+      }
+
+      function toggleTerminalLog() {
+        const panel = document.getElementById("sideLogPanel");
+        const wrapper = document.getElementById("mainContentWrapper");
+        const btnFloat = document.getElementById("btnFloatingLog");
+        terminalTerbuka = !terminalTerbuka;
+
+        if (terminalTerbuka) {
+          panel.classList.remove("translate-x-full");
+          if (window.innerWidth >= 768) {
+            wrapper.classList.add("mr-96");
+            btnFloat.classList.add("mr-96");
+          }
+          catatLog("SYS", "Panel Live Log dibuka.");
+        } else {
+          panel.classList.add("translate-x-full");
+          wrapper.classList.remove("mr-96");
+          btnFloat.classList.remove("mr-96");
+        }
+      }
+
+      function bersihkanLog(e) {
+        e.stopPropagation();
+        const body = document.getElementById("terminalBody");
+        if (body) body.innerHTML = "";
+        catatLog("SYS", "Terminal dibersihkan.");
+      }
+
+      function renderKatalog(
+        data = daftarAktif,
+        highlightIdx1 = -1,
+        highlightIdx2 = -1,
+      ) {
+        const grid = document.getElementById("gridProduk");
+        if (data.length === 0) {
+          grid.innerHTML = `
+            <div class="col-span-full py-16 text-center">
+                <p class="text-5xl mb-3">🔍</p>
+                <p class="font-extrabold text-slate-700 text-lg">Pencarian Tidak Ditemukan</p>
+                <p class="text-sm text-slate-400 mt-1">Coba gunakan kata kunci lain yang lebih umum.</p>
+            </div>`;
+          return;
+        }
+
+        grid.innerHTML = data
+          .map((item, idx) => {
+            const isHighlighted =
+              idx === highlightIdx1 || idx === highlightIdx2;
+            const activeClass = isHighlighted ? "sorting-active" : "";
+
+            return `
+            <div id="card-produk-${idx}" class="bg-white rounded-3xl border border-slate-100 shadow-card hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group ${activeClass}">
+                <div class="relative h-48 overflow-hidden bg-slate-100">
+                    <img src="${item.gambar}" alt="${item.nama}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <span class="absolute top-3 left-3 bg-white/90 backdrop-blur text-slate-800 text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                        ${item.kategori}
+                    </span>
+                </div>
+                <div class="p-5 flex-1 flex flex-col">
+                    <h3 class="font-extrabold text-slate-800 text-base group-hover:text-nexa-600 transition">${item.nama}</h3>
+                    <p class="text-xs text-slate-500 mt-1 flex items-center gap-1"><span>📍</span> ${item.lokasi}</p>
+                    
+                    <div class="mt-3 flex flex-wrap gap-1">
+                        ${item.rincian.map((r) => `<span class="bg-slate-50 text-slate-600 text-[10px] font-semibold px-2.5 py-1 rounded-lg border border-slate-100">${r}</span>`).join("")}
+                    </div>
+
+                    <div class="mt-auto pt-4 flex items-end justify-between border-t border-slate-100">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">Harga Mulai</span>
+                            <span class="text-lg font-black text-sun-500">${formatRupiah(item.harga)}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="bukaDetail(${item.id})" class="bg-nexa-50 hover:bg-nexa-100 text-nexa-700 font-extrabold text-xs px-3 py-2.5 rounded-xl transition">Detail</button>
+                            <button onclick="tambahKeKeranjang(${item.id})" class="bg-sun-500 hover:bg-sun-600 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-sun-500/20 transition">Pesan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+          })
+          .join("");
+      }
+
+      function filterKategori(kat) {
+        kategoriTerpilih = kat;
+        document.querySelectorAll(".cat-pill").forEach((btn) => {
+          btn.className =
+            "cat-pill shrink-0 px-4 py-2 rounded-2xl text-xs font-bold transition bg-slate-100 text-slate-600 hover:bg-slate-200";
+        });
+        event.target.className =
+          "cat-pill shrink-0 px-4 py-2 rounded-2xl text-xs font-bold transition bg-nexa-600 text-white shadow-md shadow-nexa-600/20";
+
+        if (kat === "all") {
+          daftarAktif = [...dataLayanan];
+        } else {
+          daftarAktif = dataLayanan.filter((item) => item.kategori === kat);
+        }
+        document.getElementById("selectSorting").value = "default";
+        catatLog(
+          "FILTER",
+          `Kategori diubah ke '${kat}' (${daftarAktif.length} items)`,
+        );
+        renderKatalog(daftarAktif);
+      }
+
+      async function jalankanSortingDropdown(mode) {
+        if (mode === "default") {
+          daftarAktif =
+            kategoriTerpilih === "all"
+              ? [...dataLayanan]
+              : dataLayanan.filter(
+                  (item) => item.kategori === kategoriTerpilih,
+                );
+          document.getElementById("infoPencarian").classList.add("hidden");
+          renderKatalog(daftarAktif);
+          return;
+        }
+
+        const banner = document.getElementById("infoPencarian");
+        const textInfo = document.getElementById("teksInfoPencarian");
+        banner.classList.remove("hidden");
+
+        catatLog(
+          "SORT",
+          `Mulai Bubble Sort O(n²) mode: [${mode.toUpperCase()}]...`,
+        );
+
+        let n = daftarAktif.length;
+        let swapped;
+        let totalSwap = 0;
+
+        for (let i = 0; i < n - 1; i++) {
+          swapped = false;
+          for (let j = 0; j < n - i - 1; j++) {
+            textInfo.innerHTML = `🔍 <b>Bubble Sort Membandingkan:</b> Card [${j}] & [${j + 1}]`;
+            renderKatalog(daftarAktif, j, j + 1);
+            await new Promise((resolve) => setTimeout(resolve, 250));
+
+            let kondisi =
+              mode === "asc"
+                ? daftarAktif[j].harga > daftarAktif[j + 1].harga
+                : daftarAktif[j].harga < daftarAktif[j + 1].harga;
+            if (kondisi) {
+              let temp = daftarAktif[j];
+              daftarAktif[j] = daftarAktif[j + 1];
+              daftarAktif[j + 1] = temp;
+              swapped = true;
+              totalSwap++;
+              catatLog(
+                "SORT",
+                `Swap Pointer: [${daftarAktif[j + 1].nama}] ↔ [${daftarAktif[j].nama}]`,
+              );
+              renderKatalog(daftarAktif, j, j + 1);
+              await new Promise((resolve) => setTimeout(resolve, 250));
+            }
+          }
+          if (!swapped) break;
+        }
+        textInfo.innerHTML = `✅ <b>Bubble Sort Selesai!</b> Total pertukaran pointer: <b>${totalSwap} kali</b>.`;
+        catatLog("SORT", `Bubble sort selesai. Total pertukaran: ${totalSwap}`);
+        renderKatalog(daftarAktif);
+        tampilkanToast("✔ Pengurutan Berhasil");
+      }
+
+      function jalankanPencarian() {
+        let keyword = document
+          .getElementById("inputCari")
+          .value.trim()
+          .toLowerCase();
+        if (!keyword) {
+          tampilkanToast("Masukkan kata kunci pencarian terlebih dahulu");
+          return;
+        }
+
+        catatLog("SEARCH", `Linear Search O(n) kata kunci: "${keyword}"`);
+        let hasilPencarian = [];
+        for (let i = 0; i < dataLayanan.length; i++) {
+          let item = dataLayanan[i];
+          if (
+            item.nama.toLowerCase().includes(keyword) ||
+            item.lokasi.toLowerCase().includes(keyword)
+          ) {
+            hasilPencarian.push(item);
+            catatLog("SEARCH", `➔ Match pada index [${i}]: ${item.nama}`);
+          }
+        }
+        daftarAktif = hasilPencarian;
+        catatLog(
+          "SEARCH",
+          `Linear search selesai. Ditemukan ${hasilPencarian.length} item.`,
+        );
+        renderKatalog(daftarAktif);
+        const banner = document.getElementById("infoPencarian");
+        banner.classList.remove("hidden");
+        document.getElementById("teksInfoPencarian").innerHTML =
+          `Menemukan <b>${hasilPencarian.length} hasil</b> untuk <i>"${keyword}"</i>`;
+        document
+          .getElementById("layanan")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
+      function resetPencarian() {
+        document.getElementById("inputCari").value = "";
+        document.getElementById("infoPencarian").classList.add("hidden");
+        daftarAktif = [...dataLayanan];
+        document.getElementById("selectSorting").value = "default";
+        catatLog("SEARCH", "Pencarian direset ke data awal.");
+        renderKatalog(daftarAktif);
+      }
+
+      function tambahKeKeranjang(id) {
+        const item = dataLayanan.find((d) => d.id === id);
+        if (!keranjang.includes(item)) {
+          keranjang.push(item);
+          jumlahPesanan.set(item, 1);
+          tanggalPesanan.set(item, getTanggalDefault());
+          statusChecklist.set(item, true);
+        } else {
+          jumlahPesanan.set(item, jumlahPesanan.get(item) + 1);
+        }
+        updateBadgeKeranjang();
+        catatLog(
+          "CART",
+          `Item '${item.nama}' ditambahkan ke keranjang pesanan.`,
+        );
+        tampilkanToast(`✔ ${item.nama} ditambahkan ke pesanan`);
+      }
+
+      function ubahJumlahItem(id, delta) {
+        const item = dataLayanan.find((d) => d.id === id);
+        if (!item || !jumlahPesanan.has(item)) return;
+
+        let qtyBaru = jumlahPesanan.get(item) + delta;
+        if (qtyBaru <= 0) {
+          hapusDariKeranjang(id);
+        } else {
+          jumlahPesanan.set(item, qtyBaru);
+          updateBadgeKeranjang();
+          catatLog(
+            "CART",
+            `Kuantitas '${item.nama}' diubah menjadi ${qtyBaru}`,
+          );
+          bukaKeranjang();
+        }
+      }
+
+      function hapusDariKeranjang(id) {
+        const item = dataLayanan.find((d) => d.id === id);
+        if (!item) return;
+
+        const idx = keranjang.indexOf(item);
+        if (idx !== -1) {
+          keranjang.splice(idx, 1);
+          jumlahPesanan.delete(item);
+          tanggalPesanan.delete(item);
+          statusChecklist.delete(item);
+          updateBadgeKeranjang();
+          catatLog("CART", `Item '${item.nama}' dihapus dari keranjang.`);
+          tampilkanToast(`🗑️ ${item.nama} dihapus dari keranjang`);
+          bukaKeranjang();
+        }
+      }
+
+      function updateTanggalPesanan(id, tglVal) {
+        const item = dataLayanan.find((d) => d.id === id);
+        if (item && tanggalPesanan.has(item)) {
+          tanggalPesanan.set(item, tglVal);
+          catatLog("CART", `Tanggal '${item.nama}' diubah ke: ${tglVal}`);
+        }
+      }
+
+      function toggleChecklistItem(id, checked) {
+        const item = dataLayanan.find((d) => d.id === id);
+        if (item && statusChecklist.has(item)) {
+          statusChecklist.set(item, checked);
+          kalkulasiTotalKeranjang();
+        }
+      }
+
+      function togglePilihSemua(checked) {
+        keranjang.forEach((item) => {
+          statusChecklist.set(item, checked);
+        });
+        bukaKeranjang();
+      }
+
+      function kalkulasiTotalKeranjang() {
+        let totalTerpilih = 0;
+        let countTerpilih = 0;
+
+        keranjang.forEach((item) => {
+          if (statusChecklist.get(item)) {
+            let qty = jumlahPesanan.get(item) || 1;
+            totalTerpilih += item.harga * qty;
+            countTerpilih++;
+          }
+        });
+
+        document.getElementById("totalHargaKeranjang").textContent =
+          formatRupiah(totalTerpilih);
+        document.getElementById("badgeItemTerpilih").textContent =
+          `${countTerpilih} item dipilih`;
+      }
+
+      function updateBadgeKeranjang() {
+        const total = Array.from(jumlahPesanan.values()).reduce(
+          (a, b) => a + b,
+          0,
+        );
+        document.getElementById("badgeKeranjang").textContent = total;
+      }
+
+      function updateBadgeBelumDibayar() {
+        document.getElementById("badgeBelumDibayar").textContent =
+          tiketBelumDibayar.length;
+      }
+
+      function bukaKeranjang() {
+        catatLog("SYS", "Membuka drawer keranjang pesanan.");
+        const list = document.getElementById("listKeranjang");
+        if (keranjang.length === 0) {
+          list.innerHTML = `
+            <div class="text-center py-20">
+              <div class="w-16 h-16 bg-slate-200/60 text-slate-400 rounded-full grid place-items-center mx-auto text-2xl mb-3">🛒</div>
+              <p class="font-extrabold text-slate-700 text-base">Keranjang Masih Kosong</p>
+              <p class="text-xs text-slate-400 mt-1">Belum ada tiket atau hotel yang Anda tambahkan.</p>
+            </div>`;
+          document.getElementById("totalHargaKeranjang").textContent =
+            formatRupiah(0);
+          document.getElementById("badgeItemTerpilih").textContent =
+            `0 item dipilih`;
+        } else {
+          const minDateToday = new Date().toISOString().split("T")[0];
+          const allChecked = keranjang.every((item) =>
+            statusChecklist.get(item),
+          );
+
+          let html = `
+            <div class="flex items-center justify-between bg-white px-4 py-2.5 rounded-xl border border-slate-200/80 shadow-xs mb-3">
+              <label class="flex items-center gap-2.5 text-xs font-bold text-slate-700 cursor-pointer">
+                <input type="checkbox" id="chkSelectAll" ${allChecked ? "checked" : ""} onchange="togglePilihSemua(this.checked)" class="w-4 h-4 text-nexa-600 rounded border-slate-300 focus:ring-nexa-500 cursor-pointer">
+                <span>Pilih Semua Tiket (${keranjang.length})</span>
+              </label>
+              <span class="text-[10px] text-slate-400 font-semibold">Bayar Parsial / Bersamaan</span>
+            </div>
+          `;
+
+          html += keranjang
+            .map((it) => {
+              let qty = jumlahPesanan.get(it) || 1;
+              let subtotal = it.harga * qty;
+              let tgl = tanggalPesanan.get(it) || getTanggalDefault();
+              let isChecked = statusChecklist.get(it) !== false;
+              let labelTanggal =
+                it.kategori === "hotel"
+                  ? "Tanggal Menginap"
+                  : "Tanggal Keberangkatan";
+
+              return `
+              <div class="bg-white rounded-2xl p-4 border ${isChecked ? "border-nexa-500/60 ring-1 ring-nexa-500/20" : "border-slate-200/80"} shadow-md flex flex-col gap-3 transition-all">
+                  <div class="flex justify-between items-start gap-2">
+                      <div class="flex items-start gap-3">
+                          <input type="checkbox" ${isChecked ? "checked" : ""} onchange="toggleChecklistItem(${it.id}, this.checked)" class="mt-1 w-4 h-4 text-nexa-600 rounded border-slate-300 focus:ring-nexa-500 cursor-pointer shrink-0">
+                          <div class="space-y-1">
+                              <span class="bg-sky-100 text-nexa-700 text-[10px] font-extrabold px-2.5 py-0.5 rounded-md uppercase tracking-wider inline-block">${it.kategori}</span>
+                              <h4 class="font-extrabold text-sm text-slate-800 leading-snug">${it.nama}</h4>
+                              <p class="text-[11px] text-slate-400 font-medium">📍 ${it.lokasi}</p>
+                          </div>
+                      </div>
+                      <button onclick="hapusDariKeranjang(${it.id})" title="Hapus" class="w-8 h-8 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white grid place-items-center text-xs font-bold transition shrink-0 shadow-xs">🗑️</button>
+                  </div>
+
+                  <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 flex flex-col gap-1">
+                      <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wide"><span>📅</span> ${labelTanggal}</label>
+                      <input type="date" min="${minDateToday}" value="${tgl}" onchange="updateTanggalPesanan(${it.id}, this.value)" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-nexa-500 cursor-pointer shadow-xs transition">
+                  </div>
+
+                  <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                      <div class="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-xl px-2 py-1">
+                          <button onclick="ubahJumlahItem(${it.id}, -1)" class="w-6 h-6 rounded-lg bg-white shadow-xs font-black text-xs text-slate-700">-</button>
+                          <span class="font-extrabold text-xs text-slate-800 px-1 min-w-[20px] text-center">${qty}</span>
+                          <button onclick="ubahJumlahItem(${it.id}, 1)" class="w-6 h-6 rounded-lg bg-white shadow-xs font-black text-xs text-slate-700">+</button>
+                      </div>
+                      <div class="text-right">
+                          <span class="text-[9px] text-slate-400 font-bold uppercase block">Subtotal</span>
+                          <span class="font-black text-sun-500 text-sm">${formatRupiah(subtotal)}</span>
+                      </div>
+                  </div>
+              </div>`;
+            })
+            .join("");
+
+          list.innerHTML = html;
+          kalkulasiTotalKeranjang();
+        }
+        document.getElementById("overlayKeranjang").classList.remove("hidden");
+        document
+          .getElementById("drawerKeranjang")
+          .classList.remove("translate-x-full");
+      }
+
+      function tutupKeranjang() {
+        document.getElementById("overlayKeranjang").classList.add("hidden");
+        document
+          .getElementById("drawerKeranjang")
+          .classList.add("translate-x-full");
+      }
+
+      function bukaDrawerBelumDibayar() {
+        catatLog("SYS", "Membuka drawer tiket belum dibayar.");
+        const list = document.getElementById("listBelumDibayar");
+        if (tiketBelumDibayar.length === 0) {
+          list.innerHTML = `
+            <div class="text-center py-20">
+              <div class="w-16 h-16 bg-amber-100/60 text-amber-500 rounded-full grid place-items-center mx-auto text-2xl mb-3">⏳</div>
+              <p class="font-extrabold text-slate-700 text-base">Tidak Ada Tiket Tertunda</p>
+              <p class="text-xs text-slate-400 mt-1">Semua pesanan Anda telah dibayar atau berada di keranjang.</p>
+            </div>`;
+        } else {
+          list.innerHTML = tiketBelumDibayar
+            .map((order, idx) => {
+              let totalOrder = order.items.reduce(
+                (sum, item) => sum + item.harga * item.qty,
+                0,
+              );
+              return `
+              <div class="bg-white rounded-2xl p-4 border border-amber-200/80 shadow-md flex flex-col gap-3">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                  <span class="text-[10px] font-extrabold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full uppercase">Invoice: ${order.idInvoice}</span>
+                  <span class="text-[11px] font-bold text-slate-400">${order.waktu}</span>
+                </div>
+                <div class="space-y-2">
+                  ${order.items
+                    .map(
+                      (it) => `
+                    <div class="text-xs flex justify-between items-center">
+                      <div>
+                        <p class="font-extrabold text-slate-800">${it.nama}</p>
+                        <p class="text-[10px] text-slate-400">📅 ${it.tanggal} • ${it.qty}x</p>
+                      </div>
+                      <span class="font-bold text-slate-700">${formatRupiah(it.harga * it.qty)}</span>
+                    </div>
+                  `,
+                    )
+                    .join("")}
+                </div>
+                <div class="flex justify-between items-center pt-2 border-t border-slate-100">
+                  <div>
+                    <span class="text-[9px] text-slate-400 uppercase font-bold block">Total Menunggu</span>
+                    <span class="text-base font-black text-sun-500">${formatRupiah(totalOrder)}</span>
+                  </div>
+                  <button onclick="lanjutkanPembayaranTertunda(${idx})" class="bg-sun-500 hover:bg-sun-600 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow-md transition">Bayar Sekarang ➔</button>
+                </div>
+              </div>`;
+            })
+            .join("");
+        }
+        document
+          .getElementById("overlayBelumDibayar")
+          .classList.remove("hidden");
+        document
+          .getElementById("drawerBelumDibayar")
+          .classList.remove("translate-x-full");
+      }
+
+      function tutupDrawerBelumDibayar() {
+        document.getElementById("overlayBelumDibayar").classList.add("hidden");
+        document
+          .getElementById("drawerBelumDibayar")
+          .classList.add("translate-x-full");
+      }
+
+      function simpanKeBelumDibayar(itemsToPay) {
+        let invoiceId = "INV-" + Math.floor(100000 + Math.random() * 900000);
+        let sekarang = new Date();
+        let formatWaktu = `${sekarang.getHours()}:${String(sekarang.getMinutes()).padStart(2, "0")}`;
+
+        let detailItems = itemsToPay.map((it) => ({
+          id: it.id,
+          nama: it.nama,
+          harga: it.harga,
+          qty: jumlahPesanan.get(it) || 1,
+          tanggal: tanggalPesanan.get(it) || getTanggalDefault(),
+        }));
+
+        tiketBelumDibayar.push({
+          idInvoice: invoiceId,
+          waktu: formatWaktu,
+          items: detailItems,
+          pemesan: { ...dataPemesan },
+        });
+
+        itemsToPay.forEach((it) => {
+          const idx = keranjang.indexOf(it);
+          if (idx !== -1) {
+            keranjang.splice(idx, 1);
+            jumlahPesanan.delete(it);
+            tanggalPesanan.delete(it);
+            statusChecklist.delete(it);
+          }
+        });
+
+        updateBadgeKeranjang();
+        updateBadgeBelumDibayar();
+        tutupVerifikasi();
+        catatLog(
+          "AUTH",
+          `Pesanan disimpan ke 'Belum Dibayar'. Invoice: ${invoiceId}`,
+        );
+        tampilkanToast("⏳ Pesanan disimpan di menu 'Belum Dibayar'");
+        document
+          .getElementById("beranda")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
+      function lanjutkanPembayaranTertunda(index) {
+        let order = tiketBelumDibayar[index];
+        tutupDrawerBelumDibayar();
+
+        catatLog(
+          "AUTH",
+          `Melanjutkan pembayaran tertunda Invoice: ${order.idInvoice}`,
+        );
+
+        let itemsToPay = order.items.map((it) => {
+          let orig = dataLayanan.find((d) => d.id === it.id);
+          if (!keranjang.includes(orig)) {
+            keranjang.push(orig);
+          }
+          jumlahPesanan.set(orig, it.qty);
+          tanggalPesanan.set(orig, it.tanggal);
+          statusChecklist.set(orig, true);
+          return orig;
+        });
+
+        tiketBelumDibayar.splice(index, 1);
+        updateBadgeBelumDibayar();
+        updateBadgeKeranjang();
+
+        renderVerifikasiLangkah1(itemsToPay);
+        document.getElementById("modalVerifikasi").classList.remove("hidden");
+      }
+
+      function mulaiVerifikasi2Langkah() {
+        const itemTerpilih = keranjang.filter((it) => statusChecklist.get(it));
+        if (keranjang.length === 0 || itemTerpilih.length === 0) {
+          tampilkanToast("⚠️ Pilih minimal satu tiket yang ingin dibayar!");
+          return;
+        }
+        tutupKeranjang();
+        catatLog("AUTH", "Memulai proses pembayaran 2 langkah.");
+        renderVerifikasiLangkah1(itemTerpilih);
+        document.getElementById("modalVerifikasi").classList.remove("hidden");
+      }
+
+      function renderVerifikasiLangkah1(itemsToPay) {
+        let total = 0;
+        let itemCards = itemsToPay
+          .map((it) => {
+            let qty = jumlahPesanan.get(it) || 1;
+            let subtotal = it.harga * qty;
+            let tgl = tanggalPesanan.get(it) || getTanggalDefault();
+            total += subtotal;
+            let labelTanggal =
+              it.kategori === "hotel" ? "Tgl Menginap" : "Tgl Keberangkatan";
+
+            return `
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 shadow-xs mb-3">
+              <div class="flex justify-between items-start mb-2">
+                <div>
+                  <span class="bg-sky-100 text-nexa-700 text-[9px] font-extrabold px-2.5 py-0.5 rounded-full uppercase inline-block mb-1">${it.kategori}</span>
+                  <h4 class="font-extrabold text-sm text-slate-800">${it.nama}</h4>
+                  <p class="text-xs text-slate-500 font-medium">📍 ${it.lokasi}</p>
+                </div>
+                <span class="font-black text-sun-500 text-sm">${formatRupiah(subtotal)}</span>
+              </div>
+              <div class="bg-white p-3 rounded-xl border border-slate-200/60 text-xs space-y-1.5 mt-2">
+                <div class="flex justify-between text-slate-600"><span>📅 ${labelTanggal}:</span><span class="font-bold text-slate-800">${tgl}</span></div>
+                <div class="flex justify-between text-slate-600"><span>🎟️ Jumlah Tiket:</span><span class="font-bold text-slate-800">${qty} x (${formatRupiah(it.harga)})</span></div>
+              </div>
+            </div>`;
+          })
+          .join("");
+
+        document.getElementById("kontenVerifikasi").innerHTML = `
+          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
+            <div>
+              <span class="bg-nexa-100 text-nexa-700 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Langkah 1 dari 2</span>
+              <h3 class="text-lg font-extrabold text-slate-800 mt-1">Rincian Tiket & Pembayaran</h3>
+            </div>
+            <button onclick="tutupVerifikasi()" class="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full font-bold text-slate-500 grid place-items-center">✕</button>
+          </div>
+
+          <div class="mb-5">
+            <h4 class="text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-2">1. Tiket yang Dipesan (${itemsToPay.length} Item)</h4>
+            <div class="max-h-56 overflow-y-auto pr-1 cart-scroll">${itemCards}</div>
+            <div class="bg-nexa-50 border border-nexa-100 p-3.5 rounded-2xl flex justify-between items-center mt-2 shadow-xs">
+              <span class="text-xs font-bold text-nexa-800">Total Tagihan Pembayaran</span>
+              <span class="text-lg font-black text-sun-500">${formatRupiah(total)}</span>
+            </div>
+          </div>
+
+          <form onsubmit="lanjutKeLangkah2(event)" class="space-y-4">
+            <div>
+              <h4 class="text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-2">2. Data Pemesan (E-Tiket)</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="col-span-2 md:col-span-1">
+                  <label class="block text-xs font-bold text-slate-600 mb-1">Nama Lengkap Pemesan</label>
+                  <input id="vfNama" type="text" value="${dataPemesan.nama}" placeholder="Contoh: Ardandi Ilham" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold outline-none focus:border-nexa-600">
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                  <label class="block text-xs font-bold text-slate-600 mb-1">Email Penerima</label>
+                  <input id="vfEmail" type="email" value="${dataPemesan.email}" placeholder="contoh@gmail.com" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold outline-none focus:border-nexa-600">
+                </div>
+                <div class="col-span-2">
+                  <label class="block text-xs font-bold text-slate-600 mb-1">Nomor WhatsApp</label>
+                  <input id="vfHp" type="tel" value="${dataPemesan.hp}" placeholder="081234567890" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold outline-none focus:border-nexa-600">
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-2">3. Pilih Metode Pembayaran</h4>
+              <div class="grid grid-cols-2 gap-3">
+                <label onclick="pilihMetode('otp')" id="optMetodeOtp" class="flex items-center gap-2.5 p-3 rounded-2xl border-2 ${metodePembayaranTerpilih === "otp" ? "border-nexa-600 bg-nexa-50/50" : "border-slate-200 bg-slate-50"} cursor-pointer transition">
+                  <input type="radio" name="metodePay" value="otp" ${metodePembayaranTerpilih === "otp" ? "checked" : ""} class="text-nexa-600">
+                  <div>
+                    <p class="text-xs font-extrabold text-slate-800">📲 OTP WhatsApp</p>
+                    <p class="text-[10px] text-slate-400">Verifikasi 6-Digit</p>
+                  </div>
+                </label>
+                <label onclick="pilihMetode('qris')" id="optMetodeQris" class="flex items-center gap-2.5 p-3 rounded-2xl border-2 ${metodePembayaranTerpilih === "qris" ? "border-nexa-600 bg-nexa-50/50" : "border-slate-200 bg-slate-50"} cursor-pointer transition">
+                  <input type="radio" name="metodePay" value="qris" ${metodePembayaranTerpilih === "qris" ? "checked" : ""} class="text-nexa-600">
+                  <div>
+                    <p class="text-xs font-extrabold text-slate-800">📷 QRIS Barcode</p>
+                    <p class="text-[10px] text-slate-400">Scan via E-Wallet</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full bg-sun-500 hover:bg-sun-600 text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition text-xs mt-3 flex items-center justify-center gap-2">
+              <span>Proses Pembayaran</span><span>➔</span>
+            </button>
+          </form>
+        `;
+      }
+
+      function pilihMetode(jenis) {
+        metodePembayaranTerpilih = jenis;
+        catatLog("AUTH", `Metode pembayaran dipilih: ${jenis.toUpperCase()}`);
+        const optOtp = document.getElementById("optMetodeOtp");
+        const optQris = document.getElementById("optMetodeQris");
+        if (jenis === "otp") {
+          optOtp.className =
+            "flex items-center gap-2.5 p-3 rounded-2xl border-2 border-nexa-600 bg-nexa-50/50 cursor-pointer transition";
+          optQris.className =
+            "flex items-center gap-2.5 p-3 rounded-2xl border-2 border-slate-200 bg-slate-50 cursor-pointer transition";
+        } else {
+          optQris.className =
+            "flex items-center gap-2.5 p-3 rounded-2xl border-2 border-nexa-600 bg-nexa-50/50 cursor-pointer transition";
+          optOtp.className =
+            "flex items-center gap-2.5 p-3 rounded-2xl border-2 border-slate-200 bg-slate-50 cursor-pointer transition";
+        }
+      }
+
+      function lanjutKeLangkah2(e) {
+        e.preventDefault();
+        dataPemesan.nama = document.getElementById("vfNama").value;
+        dataPemesan.email = document.getElementById("vfEmail").value;
+        dataPemesan.hp = document.getElementById("vfHp").value;
+
+        const itemDibayar = keranjang.filter((it) => statusChecklist.get(it));
+        let total = itemDibayar.reduce(
+          (acc, item) => acc + item.harga * (jumlahPesanan.get(item) || 1),
+          0,
+        );
+
+        catatLog(
+          "AUTH",
+          `Langkah 1 Selesai. Total Tagihan: ${formatRupiah(total)}. Mengarah ke Langkah 2...`,
+        );
+
+        if (metodePembayaranTerpilih === "otp") {
+          kodeOtpSimulasi = Math.floor(
+            100000 + Math.random() * 900000,
+          ).toString();
+          catatLog(
+            "AUTH",
+            `Kode OTP dikirimkan ke ${dataPemesan.hp}: [${kodeOtpSimulasi}]`,
+          );
+          document.getElementById("kontenVerifikasi").innerHTML = `
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
+              <div>
+                <span class="bg-sun-100 text-sun-600 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Langkah 2 dari 2</span>
+                <h3 class="text-lg font-extrabold text-slate-800 mt-1">Verifikasi OTP WhatsApp</h3>
+              </div>
+              <button onclick="tutupVerifikasi()" class="w-8 h-8 bg-slate-100 rounded-full font-bold text-slate-500">✕</button>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl mb-4 text-center">
+              <p class="text-xs text-amber-800">Kode OTP simulasi dikirim ke nomor WhatsApp <b>${dataPemesan.hp}</b>:</p>
+              <p class="text-2xl font-black font-mono text-amber-600 tracking-widest mt-1.5">${kodeOtpSimulasi}</p>
+            </div>
+            <form onsubmit="verifikasiSelesai(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1 text-center">Masukkan Kode 6-Digit</label>
+                <input id="inputOtp" type="text" maxlength="6" placeholder="______" required class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 text-center text-xl font-mono font-extrabold tracking-widest outline-none focus:border-sun-500">
+              </div>
+              <div class="flex flex-col sm:flex-row gap-2">
+                <button type="button" onclick="renderVerifikasiLangkah1(keranjang.filter(it => statusChecklist.get(it)))" class="sm:w-1/4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl text-xs transition">Kembali</button>
+                <button type="button" onclick="simpanKeBelumDibayar(keranjang.filter(it => statusChecklist.get(it)))" class="sm:w-1/3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl text-xs transition flex items-center justify-center gap-1">🏠 Bayar Nanti</button>
+                <button type="submit" class="sm:w-5/12 bg-sun-500 hover:bg-sun-600 text-white font-extrabold py-3 rounded-xl text-xs shadow-md transition">Verifikasi & Bayar (${formatRupiah(total)})</button>
+              </div>
+            </form>
+          `;
+        } else {
+          catatLog(
+            "AUTH",
+            `Generasi QRIS Barcode untuk ${formatRupiah(total)}...`,
+          );
+          document.getElementById("kontenVerifikasi").innerHTML = `
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
+              <div>
+                <span class="bg-nexa-100 text-nexa-700 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Langkah 2 dari 2</span>
+                <h3 class="text-lg font-extrabold text-slate-800 mt-1">Pembayaran QRIS Barcode</h3>
+              </div>
+              <button onclick="tutupVerifikasi()" class="w-8 h-8 bg-slate-100 rounded-full font-bold text-slate-500">✕</button>
+            </div>
+            <div class="text-center py-2 space-y-3">
+              <p class="text-xs text-slate-500">Scan QRIS menggunakan aplikasi M-Banking atau E-Wallet:</p>
+              <div class="inline-block bg-white p-4 rounded-3xl border-2 border-slate-200 shadow-md my-2">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=NEXATRIP-PAYMENT-${total}" alt="QRIS" class="w-44 h-44 mx-auto rounded-xl">
+                <p class="text-[10px] font-mono font-bold text-slate-400 mt-2">NMV-QRIS-NEXATRIP-2026</p>
+              </div>
+              <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-xs">
+                <span class="text-slate-500 block">Total Nominal:</span>
+                <span class="text-xl font-black text-sun-500">${formatRupiah(total)}</span>
+              </div>
+              <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                <button type="button" onclick="renderVerifikasiLangkah1(keranjang.filter(it => statusChecklist.get(it)))" class="sm:w-1/4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl text-xs transition">Kembali</button>
+                <button type="button" onclick="simpanKeBelumDibayar(keranjang.filter(it => statusChecklist.get(it)))" class="sm:w-1/3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl text-xs transition flex items-center justify-center gap-1">🏠 Bayar Nanti</button>
+                <button type="button" onclick="simulasiScanQrisSukses()" class="sm:w-5/12 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl text-xs shadow-md transition">Simulasi Bayar QRIS Sukses ✓</button>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      function simulasiScanQrisSukses() {
+        konfirmasiPembayaranBerhasil();
+      }
+
+      function verifikasiSelesai(e) {
+        e.preventDefault();
+        let inputKode = document.getElementById("inputOtp").value.trim();
+        if (inputKode !== kodeOtpSimulasi) {
+          catatLog("AUTH", "Verifikasi OTP Gagal: Kode tidak cocok.");
+          tampilkanToast("❌ Kode verifikasi salah!");
+          return;
+        }
+        konfirmasiPembayaranBerhasil();
+      }
+
+      function konfirmasiPembayaranBerhasil() {
+        let kodeBooking = "NXT-" + Math.floor(100000 + Math.random() * 900000);
+        const itemDibayar = keranjang.filter((it) => statusChecklist.get(it));
+        let total = itemDibayar.reduce(
+          (acc, item) => acc + item.harga * (jumlahPesanan.get(item) || 1),
+          0,
+        );
+
+        catatLog(
+          "AUTH",
+          `Pembayaran Sukses! Kode Booking: ${kodeBooking}. Total: ${formatRupiah(total)}`,
+        );
+
+        document.getElementById("kontenVerifikasi").innerHTML = `
+          <div class="text-center py-2">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full grid place-items-center mx-auto text-3xl mb-3">✓</div>
+            <span class="bg-emerald-100 text-emerald-700 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase">Pembayaran Berhasil</span>
+            <h3 class="text-xl font-extrabold text-slate-800 mt-2">Pemesanan Dikonfirmasi!</h3>
+            <p class="text-xs text-slate-500 mt-1">Kode Booking: <b class="text-nexa-700 font-mono">${kodeBooking}</b></p>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 my-4 text-xs space-y-2">
+            <div class="flex justify-between border-b border-slate-200 pb-2"><span class="text-slate-500">Nama Pemesan:</span><span class="font-bold">${dataPemesan.nama}</span></div>
+            <div class="flex justify-between border-b border-slate-200 pb-2"><span class="text-slate-500">Metode Bayar:</span><span class="font-bold uppercase">${metodePembayaranTerpilih}</span></div>
+            <div class="flex justify-between pt-1"><span class="text-slate-500">Total Dibayar:</span><span class="font-extrabold text-sun-500">${formatRupiah(total)}</span></div>
+          </div>
+          <button onclick="selesaikanSemua()" class="w-full bg-nexa-600 hover:bg-nexa-700 text-white font-extrabold py-3 rounded-xl text-xs transition">Selesai & Unduh E-Tiket</button>
+        `;
+
+        itemDibayar.forEach((it) => {
+          const idx = keranjang.indexOf(it);
+          if (idx !== -1) {
+            keranjang.splice(idx, 1);
+            jumlahPesanan.delete(it);
+            tanggalPesanan.delete(it);
+            statusChecklist.delete(it);
+          }
+        });
+
+        updateBadgeKeranjang();
+        updateBadgeBelumDibayar();
+      }
+
+      function tutupVerifikasi() {
+        document.getElementById("modalVerifikasi").classList.add("hidden");
+      }
+      function selesaikanSemua() {
+        tutupVerifikasi();
+        tampilkanToast("🎉 E-Tiket dikirim ke WhatsApp & Email!");
+      }
+
+      function bukaDetail(id) {
+        const item = dataLayanan.find((d) => d.id === id);
+        catatLog("SYS", `Membuka detail produk '${item.nama}'`);
+        const modal = document.getElementById("modalDetail");
+        const konten = document.getElementById("kontenModal");
+
+        konten.innerHTML = `
+          <div class="relative h-56">
+              <img src="${item.gambar}" class="w-full h-full object-cover">
+              <button onclick="tutupModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/90 hover:bg-white grid place-items-center font-bold shadow">✕</button>
+          </div>
+          <div class="p-6">
+              <h3 class="text-xl font-extrabold text-slate-800">${item.nama}</h3>
+              <p class="text-sm text-slate-500 mt-1">📍 ${item.lokasi}</p>
+              <div class="mt-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                  <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Fasilitas:</p>
+                  <ul class="space-y-1 text-sm text-slate-700">
+                      ${item.rincian.map((r) => `<li>✔ ${r}</li>`).join("")}
+                  </ul>
+              </div>
+              <div class="mt-6 flex justify-between items-center">
+                  <div>
+                      <span class="text-xs text-slate-400 block">Harga</span>
+                      <span class="text-2xl font-black text-sun-500">${formatRupiah(item.harga)}</span>
+                  </div>
+                  <button onclick="tambahKeKeranjang(${item.id}); tutupModal();" class="bg-sun-500 hover:bg-sun-600 text-white font-extrabold px-6 py-3 rounded-2xl transition">Pesan Sekarang</button>
+              </div>
+          </div>
+        `;
+        modal.classList.remove("hidden");
+      }
+
+      function tutupModal() {
+        document.getElementById("modalDetail").classList.add("hidden");
+      }
+
+      function tampilkanToast(pesan) {
+        const t = document.getElementById("toast");
+        t.textContent = pesan;
+        t.classList.remove("hidden");
+        setTimeout(() => t.classList.add("hidden"), 2500);
+      }
+
+      window.onload = function () {
+        renderKatalog(dataLayanan);
+        catatLog("SYS", "NexaTrip Platform Inisialisasi Berhasil.");
+        catatLog("INFO", "Struct LayananTravel dan Array Master Data Siap.");
+        jalankanAnimasiOpening();
+      };
+    </script>
+  </body>
+</html>
